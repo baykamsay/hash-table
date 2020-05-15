@@ -76,33 +76,107 @@ int HashTable::h_i(int key, int i) {
 	return result;
 }
 
-int HashTable::findLocation(int key) {
+int HashTable::findEmptyLocation(int key) {
 	int firstLoc = h_i(key, 0);
-	if (table[firstLoc].isEmpty)
+	if (table[firstLoc].status == OCCUPIED && table[firstLoc].data == key)
+		return -1;
+	if (table[firstLoc].status != OCCUPIED)
 		return firstLoc;
 
 	for (int i = 1; true; i++) {
 		int loc = h_i(key, i);
-		if (loc == firstLoc)
+		if (loc == firstLoc || (table[loc].status == OCCUPIED && table[loc].data == key))
 			return -1;
 
-		if (table[loc].isEmpty) {
+		if (table[loc].status != OCCUPIED) {
 			return loc;
 		}
 	}
 }
 
 bool HashTable::insert(const int item) {
-	int loc = findLocation(item);
+	int loc = findEmptyLocation(item);
 
 	if (loc == -1)
 		return false;
 	
 	table[loc].data = item;
-	table[loc].isEmpty = false;
+	table[loc].status = OCCUPIED;
 	return true;
 }
 
 bool HashTable::remove(const int item) {
+	int firstLoc = h_i(item, 0);
+	if (table[firstLoc].status == EMPTY)
+		return false;
 
+	if (table[firstLoc].data == item) {
+		table[firstLoc].data = 0;
+		table[firstLoc].status = DELETED;
+		return true;
+	}
+	
+	for (int i = 1; true; i++) {
+		int loc = h_i(item, i);
+		if (firstLoc == loc || table[loc].status == EMPTY)
+			return false;
+		if (table[loc].data == item) {
+			table[loc].data = 0;
+			table[loc].status = DELETED;
+			return true;
+		}
+	}
+}
+
+bool HashTable::search(const int item, int& numProbes) {
+	numProbes = 1;
+	int firstLoc = h_i(item, 0);
+
+	if (table[firstLoc].status == EMPTY)
+		return false;
+	if (table[firstLoc].data == item)
+		return true;
+
+	for (int i = 1; true; i++) {
+		numProbes++;
+		int loc = h_i(item, i);
+		if (firstLoc == loc || table[loc].status == EMPTY)
+			return false;
+		if (table[loc].data == item)
+			return true;
+	}
+}
+
+void HashTable::display() {
+	for (int i = 0; i < size; i++) {
+		cout << i << ": ";
+		if (table[i].status == OCCUPIED)
+			cout << table[i].data;
+		cout << endl;
+	}
+}
+
+void HashTable::analyze(double& numSuccProbes, double& numUnsuccProbes) {
+	int totSuccProbes = 0;
+	int probes = 0;
+	int occupiedPlaces = 0;
+
+	for (int i = 0; i < size; i++) {
+		if (table[i].status == OCCUPIED) {
+			search(table[i].data, probes);
+			occupiedPlaces++;
+			totSuccProbes += probes;
+		}
+	}
+	numSuccProbes = (double) totSuccProbes / occupiedPlaces;
+	// add exception for double hashing
+	int totUnsuccProbes = 0;
+
+	for (int i = 0; i < size; i++) {
+		int j = i;
+		while (search(j, probes))
+			j += size;
+		totUnsuccProbes += probes;
+	}
+	numUnsuccProbes = (double) totUnsuccProbes / size;
 }

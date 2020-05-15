@@ -9,9 +9,11 @@
 #define __HASHTABLE_H
 
 enum CollisionStrategy {LINEAR, QUADRATIC, DOUBLE};
+enum State {OCCUPIED, EMPTY, DELETED};
+
 struct Integer {
 	int data = 0;
-	bool isEmpty = true;
+	State status = EMPTY;
 };
 
 class HashTable {
@@ -22,13 +24,13 @@ public:
 	bool remove(const int item);
 	bool search(const int item, int& numProbes);
 	void display();
-	void analyze(int& numSuccProbes, int& numUnsuccProbes);
+	void analyze(double& numSuccProbes, double& numUnsuccProbes);
 private:
 	int hash(int key); // hash function (mod in this case)
 	int hash2(int key); // second hash function for double hashing
 	int f(int i, int key); // collision resolution strategy
 	int h_i(int key, int i); // as seen in hw4 pdf
-	int findLocation(int key);
+	int findEmptyLocation(int key);
 
 	CollisionStrategy cs;
 	int size;
