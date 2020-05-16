@@ -12,7 +12,7 @@ using namespace std;
 HashTable::HashTable(const int tableSize, const CollisionStrategy option) {
 	size = tableSize;
 	cs = option;
-	table = new Integer[size];
+	table = new TableItem[size];
 }
 
 HashTable::~HashTable() {
@@ -76,6 +76,7 @@ int HashTable::h_i(int key, int i) {
 	return result;
 }
 
+// find empty location for insert
 int HashTable::findEmptyLocation(int key) {
 	int firstLoc = h_i(key, 0);
 	if (table[firstLoc].status == OCCUPIED && table[firstLoc].data == key)
@@ -157,6 +158,7 @@ void HashTable::display() {
 }
 
 void HashTable::analyze(double& numSuccProbes, double& numUnsuccProbes) {
+	// successful
 	int totSuccProbes = 0;
 	int probes = 0;
 	int occupiedPlaces = 0;
@@ -169,14 +171,20 @@ void HashTable::analyze(double& numSuccProbes, double& numUnsuccProbes) {
 		}
 	}
 	numSuccProbes = (double) totSuccProbes / occupiedPlaces;
-	// add exception for double hashing
-	int totUnsuccProbes = 0;
 
-	for (int i = 0; i < size; i++) {
-		int j = i;
-		while (search(j, probes))
-			j += size;
-		totUnsuccProbes += probes;
+	// unsuccessful
+	// add exception for double hashing
+	if (cs == DOUBLE)
+		numUnsuccProbes = -1;
+	else {
+		int totUnsuccProbes = 0;
+
+		for (int i = 0; i < size; i++) {
+			int j = i;
+			while (search(j, probes))
+				j += size;
+			totUnsuccProbes += probes;
+		}
+		numUnsuccProbes = (double) totUnsuccProbes / size;
 	}
-	numUnsuccProbes = (double) totUnsuccProbes / size;
 }

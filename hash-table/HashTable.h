@@ -11,9 +11,9 @@
 enum CollisionStrategy {LINEAR, QUADRATIC, DOUBLE};
 enum State {OCCUPIED, EMPTY, DELETED};
 
-struct Integer {
+struct TableItem {
 	int data = 0;
-	State status = EMPTY;
+	State status = EMPTY; // initialize to empty
 };
 
 class HashTable {
@@ -34,6 +34,6 @@ private:
 
 	CollisionStrategy cs;
 	int size;
-	Integer* table;
+	TableItem* table;
 };
 #endif // !__HASHTABLE_H
