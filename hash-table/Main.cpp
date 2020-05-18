@@ -8,19 +8,34 @@
 using namespace std;
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include <fstream>
 #include "HashTable.h"
 
-const string FILE_NAME = "input.txt";
-const int TABLE_SIZE = 997;
-const CollisionStrategy COLLISION_STRATEGY = DOUBLE;
-
-int main() {
-	fstream input(FILE_NAME);
-	HashTable t(TABLE_SIZE, COLLISION_STRATEGY);
+// create a hash table with given collision strategy and do the operations
+// in the given file
+void hashTableTest(int tableSize, string fileName, CollisionStrategy cs) {
+	fstream input(fileName);
+	HashTable t(tableSize, cs);
+	cout << "--------------------------------------------------------------" << endl;
+	cout << "Collision Strategy: ";
+	switch (cs)
+	{
+	case LINEAR:
+		cout << "Linear Probing";
+		break;
+	case QUADRATIC:
+		cout << "Quadratic Probing";
+		break;
+	case DOUBLE:
+		cout << "Double Hashing";
+		break;
+	default:
+		break;
+	}
+	cout << endl;
+	cout << endl;
 	
-	cout << "Collision Strategy: " << COLLISION_STRATEGY << endl;
-
 	char operation;
 	int number;
 
@@ -54,23 +69,43 @@ int main() {
 			break;
 		}
 	}
-
+	cout << endl;
 	t.display();
-
+	cout << endl;
 	double numSuccProbes;
 	double numUnsuccProbes;
-	
+
 	t.analyze(numSuccProbes, numUnsuccProbes);
 
 	cout << fixed << setprecision(4);
-	cout << "Average number of probes for successful search: " 
+	cout << "Average number of probes for successful search: "
 		<< numSuccProbes << endl;
 	cout << "Average number of probes for unsuccessful search: "
 		<< numUnsuccProbes << endl;
+	cout << "--------------------------------------------------------------" << endl;
+	cout << endl;
+}
 
-	//fstream file("input.txt");
-	//for (int i = 0; i < 700; i++) {
-	//	file << "I " << rand() % 10000 << endl;
-	//}
+void generateFile(string fileName) {
+	fstream file(fileName);
+
+	for (int i = 0; i < 6; i++) {
+		file << "I " << rand() % 100 << endl;
+	}
+}
+
+// argv[1] -> the size of the hash table
+// argv[2] -> the name of the input file
+int main(int argc, char* argv[]) {
+	int tableSize = stoi(argv[1]);
+	string fileName = argv[2];
+
+	//generateFile(fileName);
+	
+	cout << "Table size used: " << tableSize << endl;
+	hashTableTest(tableSize, fileName, LINEAR);
+	hashTableTest(tableSize, fileName, QUADRATIC);
+	hashTableTest(tableSize, fileName, DOUBLE);
+
 	return 0;
 }

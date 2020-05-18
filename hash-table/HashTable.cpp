@@ -57,7 +57,7 @@ int HashTable::f(int i, int key) {
 		result = i;
 		break;
 	case QUADRATIC:
-		result = i ^ 2;
+		result = i * i;
 		break;
 	case DOUBLE:
 		result = i * hash2(key);
@@ -71,6 +71,7 @@ int HashTable::f(int i, int key) {
 
 int HashTable::h_i(int key, int i) {
 	int result = (hash(key) + f(i, key)) % size;
+	
 	if (result < 0)
 		result *= -1;
 	return result;
@@ -174,17 +175,20 @@ void HashTable::analyze(double& numSuccProbes, double& numUnsuccProbes) {
 
 	// unsuccessful
 	// add exception for double hashing
-	if (cs == DOUBLE)
+	if (cs == DOUBLE) {
 		numUnsuccProbes = -1;
+	}
 	else {
 		int totUnsuccProbes = 0;
 
 		for (int i = 0; i < size; i++) {
 			int j = i;
+
 			while (search(j, probes))
 				j += size;
 			totUnsuccProbes += probes;
 		}
+		
 		numUnsuccProbes = (double) totUnsuccProbes / size;
 	}
 }
